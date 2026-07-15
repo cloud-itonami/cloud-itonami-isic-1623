@@ -1,0 +1,33 @@
+{:itonami.blueprint/id "cloud-itonami-isic-1623"
+ :itonami.blueprint/name "Manufacture of wooden containers"
+ :itonami.blueprint/isic-rev5 "1623"
+ :itonami.blueprint/domain :wood-products/wooden-containers
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:worker-safety :local-economy :resource-efficiency]
+ :itonami.blueprint/governor :wooden-container-shop-plant-operations-governor
+ :itonami.blueprint/robotics true
+ :itonami.blueprint/required-technologies [:robotics :identity :forms :dmn :bpmn :audit-ledger :cae]
+ :itonami.blueprint/status :public-oss
+ :itonami.blueprint/maturity :implemented
+ :itonami.blueprint/implemented-slice
+ "WoodenContainerAdvisor ⊣ Wooden Container Shop Plant Operations
+ Governor, langgraph-clj StateGraph, append-only audit ledger. A plant
+ OPERATIONS COORDINATION actor for wooden-container manufacturing
+ (crates, pallets, and barrels/casks manufactured via cutting/
+ assembly lines -- cooperage) -- not direct cutting/assembly-line-
+ equipment operation authority. Four ops (`:log-production-batch` /
+ `:schedule-maintenance` / `:flag-safety-concern` /
+ `:coordinate-shipment`), all `:effect :propose` only. Ten concrete
+ governor checks elaborate this blueprint's four HARD invariants:
+ propose-only effect, closed op allowlist, closed proposal-effect
+ allowlist (no direct cutting/assembly-line-equipment control),
+ permanent cutting/assembly-line-finalize block, independent
+ equipment verification/registration before maintenance scheduling,
+ independent batch verification/registration before shipment
+ coordination, independent shipment-unit-count recompute against the
+ batch's own logged unit count, double-schedule guard, dimensional-
+ spec validation, and output-quality plausibility validation.
+ Safety-concern flagging (materials-safety / equipment-safety /
+ ISPM-15 heat-treatment-compliance) ALWAYS escalates to a human plant
+ supervisor; `:log-production-batch` is the only op eligible to
+ auto-commit, and only at phase 3 when governor-clean."}
