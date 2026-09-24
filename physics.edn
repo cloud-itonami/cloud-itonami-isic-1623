@@ -1,0 +1,33 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; README has no "Robotics premise" section. The shop makes crates, pallets
+;; and barrels/casks on cutting/assembly lines and in the cooperage. Its
+;; physical work here: heat-treating pallets until the middle of the thickest
+;; member reaches the ISPM 15 core temperature, and placing deck boards onto
+;; the stringers in the pallet nailing jig.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-1623"
+ :cases
+ [{:id :pallet-ispm15-heat-treatment
+   :kind :thermal
+   :procedure "stacked pallets heat in the heat-treatment chamber (air on both faces) until the middle of the thickest member reaches 56 C, the ISPM 15 heat-treatment core temperature; swept :thickness-m is HALF the thickness (heated face to mid-plane), mid-plane adiabatic by symmetry, so the back face is the middle"
+   :params {:conductivity-w-mk 0.14 :density-kg-m3 600.0 :specific-heat-j-kgk 1900.0
+            :t0-c 15.0 :t-hot-c 70.0 :h-front-w-m2k 20.0 :t-back-ambient-c 15.0 :h-back-w-m2k 0.0
+            :threshold-c 56.0 :duration-s 43200.0 :nodes 11}
+   :sweep {:param :thickness-m :values [0.011 0.019 0.025 0.038 0.05]}
+   :quantity :time-to-threshold-s
+   :limit {:max 14400.0 :basis "estimate: 4-hour heat-up allowance per chamber load before the ISPM 15 hold (56 C core for 30 min) can start"}
+   :boundary {:lo 0.005 :hi 0.1}}
+  {:id :deck-board-to-jig
+   :kind :manipulator
+   :procedure "arm lifts a deck board from the board magazine and places it across the stringers in the pallet nailing jig"
+   :params {:l1-m 0.60 :l2-m 0.50 :m1-kg 8.0 :m2-kg 5.0
+            :from [0.30 0.60] :to [0.85 0.05] :duration-s 1.5 :steps 400}
+   :sweep {:param :payload-kg :values [2.0 3.0 4.0 5.0 6.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 150.0 :basis "estimate: continuous shoulder torque of a mid-size (~15 kg class) handling arm; the 0.85 m reach to the jig needs more than a light arm"}
+   :boundary {:lo 0.5 :hi 40.0}}]}
